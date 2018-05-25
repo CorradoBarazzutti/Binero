@@ -101,7 +101,7 @@ def condition2(n):
     result = []
     for i in range(n):
         for j in range(n-2):
-           result.append([n*i+j+1, n*i+j+2,n*i+j+3])
+           result.append([n*i+j+1, n*i+j+2, n*i+j+3])
            result.append([-(n*i+j+1), -(n*i+j+2), -(n*i+j+3)])
 
     return(result)
