@@ -5,12 +5,13 @@ Created on Thu May 24 16:18:15 2018
 @author: Stiopa
 """
 
-#Xij = Xn*i+j+1 
+#Xij = n*i+j+1 
+#Yi i' j' = (i+1)*n**2 + n*i' + j' + 1 si i est une ligne
+#Yj i' j' = (n+j+1)*n**2 + n*i' + j' + 1 si i est une colone 
 import os
 
 import itertools as it
 import numpy as np
-
 
 import BineroIO
 
@@ -56,7 +57,7 @@ class Binero_fnc:
             self.PATH + "/output/" + self.filename + ".dimacs", 
             conditions)
 
-def condition1(n):
+def condition1pourri(n):
     result = []
     # first we create a matrix which holds all the possible lines (that have as many 0 as 1)
     # we replace the 0 by -1
@@ -76,7 +77,8 @@ def condition1(n):
             possible(i+1, j+1, line+[1])
     #we launch the function
     possible(0,0,[])
-
+    print len(possible_lines)
+    
     #now we use it to create the fnc formula for the lines
     for nline in range(n):
         #nline is the number of the line
@@ -96,14 +98,71 @@ def condition1(n):
             result.append(clause)
     
     return(result)
+    
+def condition1(n):
+    result = []
+    #the function order creates clauses so that y1 y2 is x1 x2 but ordered
+    def ordre(x1,x2,y1,y2):
+        result = [[-y1, x1, x2],
+                  [-y2, x1, x2],
+                  [-x1, y1, y2],
+                  [-x2, y1, y2],
+                  [y1, -x1, -x2],
+                  [y1, -x1, -x2],
+                  [x1, -y1, -y2],
+                  [x2, -y1, -y2],
+                  [-y1, -x1, x2],
+                  [-y1, x1, -x2],
+                  [y2, -x1, x2],
+                  [y2, x1, -x2],
+                  [y1, x1, x2],
+                  [y1, -x1, -x2],
+                  [-y2, x1, x2],
+                  [-y2, -x1, -x2]]
+        return(result)
+    #------------fin fonction ordre-----------------
+    #pour les lignes
+    #pour comprendre de quoi il s'agit, il faut regarder la formule
+    #désolé, mais c'est vraiment trop long à expliquer dans les commentaires
+    for i in range(n):
+        for j in range(0,n,2):
+            result.append(ordre(n*i+j+1, n*i+j+2, (i+1)*n*n+0+j+1, (i+1)*n*n+0+j+2))
+        for iprime in range(2,n,2):
+            for jprime in range(0,n,2):
+                result.append(ordre((i+1)*n*n+iprime*n+jprime+1, (i+1)*n*n+iprime*n+jprime+2, (i+1)*n*n+(iprime+1)*n+jprime+1, (i+1)*n*n+(iprime+1)*n+jprime+2))
+        for iprime in range(1,n,2):
+            for jprime in range(1,n-1,2):
+                result.append(ordre((i+1)*n*n+iprime*n+jprime+1, (i+1)*n*n+iprime*n+jprime+2, (i+1)*n*n+(iprime+1)*n+jprime+1, (i+1)*n*n+(iprime+1)*n+jprime+2))
+        result.append([-((i+1)*n*n+(n-1)*n+j+1) for j in range(n/2)]+[((i+1)*n*n+(n-1)*n+j+1) for j in range(n/2, n)])
+    #pour les colones
+    for j in range(n):
+        for i in range(0,n,2):
+            result.append(ordre(n*i+j+1, n*(i+1)+j+1, (j+1)*n*n+i+1, (j+1)*n*n+i+2))
+        for iprime in range(2,n,2):
+            for jprime in range(0,n,2):
+                result.append(ordre((n+j+1)*n*n+iprime*n+jprime+1, (n+j+1)*n*n+iprime*n+jprime+2, (n+j+1)*n*n+(iprime+1)*n+jprime+1, (n+j+1)*n*n+(iprime+1)*n+jprime+2))
+        for iprime in range(1,n,2):
+            for jprime in range(1,n-1,2):
+                result.append(ordre((n+j+1)*n*n+iprime*n+jprime+1, (n+j+1)*n*n+iprime*n+jprime+2, (n+j+1)*n*n+(iprime+1)*n+jprime+1, (n+j+1)*n*n+(iprime+1)*n+jprime+2))
+        result.append([-((n+j+1)*n*n+(n-1)*n+j+1) for j in range(n/2)]+[((n+j+1)*n*n+(n-1)*n+j+1) for j in range(n/2, n)])
+        
+    return(result)
 
 def condition2(n):
     result = []
+    #lignes
     for i in range(n):
         for j in range(n-2):
            result.append([n*i+j+1, n*i+j+2,n*i+j+3])
            result.append([-(n*i+j+1), -(n*i+j+2), -(n*i+j+3)])
-
+    
+    #colones
+    
+    for i in range(n):
+        for j in range(n-2):
+           result.append([n*i+j+1, n*(i+1)+j+1,n*(i+1)+j+1])
+           result.append([-(n*i+j+1), -(n*(i+1)+j+1), -(n*(i+2)+j+1)])
+          
     return(result)
 
 def condition3(n):
