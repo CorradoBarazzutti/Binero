@@ -52,6 +52,7 @@ def write_dimacs(filename, conditions):
         + str(max([max(row) for row in conditions])) + " "
         + str(len(conditions)) + "\n")
     # clauses
+    print(conditions)
     for cond in conditions:
         for var in cond:
             out.writelines(str(var) + " ")
