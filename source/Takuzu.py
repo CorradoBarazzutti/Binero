@@ -88,6 +88,6 @@ class Takuzu:
             output_grid = [[1 if r[i][j] == True else 0
                             for j in range(num_cols)]
                            for i in range(num_rows)]
-            BineroIO.write_binero(self.PATH + "/output/" + self.filename + "_solution1", output_grid)
+            BineroIO.write_binero(self.PATH + "/output/" + self.filename + "_solutionSMT", output_grid)
         else:
             print("failed to solve")
