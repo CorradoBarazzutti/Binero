@@ -58,7 +58,7 @@ class Binero_fnc:
             self.PATH + "/output/" + self.filename + ".dimacs", 
             conditions)
 
-def condition1pourri(n):
+def condition1expensive(n):
     result = []
     # first we create a matrix which holds all the possible lines (that have as many 0 as 1)
     # we replace the 0 by -1
@@ -126,13 +126,22 @@ def condition1(n):
     #désolé, mais c'est vraiment trop long à expliquer dans les commentaires
     for i in range(n):
         for j in range(0,n,2):
-            result += ordre(n*i+j+1, n*i+j+2, (i+1)*n*n+0+j+1, (i+1)*n*n+0+j+2)
+            result += ordre(n*i+j+1,
+                            n*i+j+2,
+                            (i+1)*n*n+0+j+1,
+                            (i+1)*n*n+0+j+2)
         for iprime in range(2,n,2):
             for jprime in range(0,n,2):
-                result += ordre((i+1)*n*n+iprime*n+jprime+1, (i+1)*n*n+iprime*n+jprime+2, (i+1)*n*n+(iprime+1)*n+jprime+1, (i+1)*n*n+(iprime+1)*n+jprime+2)
+                result += ordre((i+1)*n*n+iprime*n+jprime+1,
+                    (i+1)*n*n+iprime*n+jprime+2,
+                    (i+1)*n*n+(iprime+1)*n+jprime+1,
+                    (i+1)*n*n+(iprime+1)*n+jprime+2)
         for iprime in range(1,n,2):
             for jprime in range(1,n-1,2):
-                result += ordre((i+1)*n*n+iprime*n+jprime+1, (i+1)*n*n+iprime*n+jprime+2, (i+1)*n*n+(iprime+1)*n+jprime+1, (i+1)*n*n+(iprime+1)*n+jprime+2)
+                result += ordre((i+1)*n*n+iprime*n+jprime+1,
+                    (i+1)*n*n+iprime*n+jprime+2,
+                    (i+1)*n*n+(iprime+1)*n+jprime+1,
+                    (i+1)*n*n+(iprime+1)*n+jprime+2)
         result.append([-((i+1)*n*n+(n-1)*n+j+1) for j in range(n//2)]+[((i+1)*n*n+(n-1)*n+j+1) for j in range(n//2, n)])
     #pour les colones
     for j in range(n):
