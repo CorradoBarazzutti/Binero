@@ -182,7 +182,7 @@ def condition2(n):
           
     return(result)
 
-def condition3(n):
+def condition3_naive(n):
     result = []
     #pas 2 lignes pareilles 
     #i et j représentent les numéros de deux lignes
@@ -207,5 +207,48 @@ def condition3(n):
                     for k in range(n):
                         clause = clause + [combi[k]*(k*n+i+1), combi[k]*(k*n+j+1)]
                     result.append(clause)
+                    
+    return(result)
+
+def condition3(n):
+    result = []
+    # 
+	def x(i, j):
+		return n*i + j + 1
+	# 
+	def y(i, j, k):
+		return 2 * n * n * n + (i) * n**2 + (j) * n + k + 1
+
+    #pas 2 lignes pareilles 
+    #i et j représentent les numéros de deux lignes
+    for i in range(n):
+        for j in range(n):
+            if i<j:
+            	# condition
+                result.append([y(i, j, k) for k in range(n)])
+                # substitution
+                c1, c2, c3, c4 = [], [], [], []
+                for k in range(n):
+                	c1.append([y(i,j,k), -x(i,k), x(j,k)])
+                	c2.append([y(i,j,k), x(i,k), -x(j,k)])
+                	c3.append([-y(i,j,k), x(i,k), x(j,k)])
+                	c3.append([-y(i,j,k), -x(i,k), -x(j,k)])
+                result += c1 + c2 + c3 + c4
+
+    #pas 2 colones pareilles 
+    #i et j représentent les numéros de deux colones
+    for i in range(n):
+        for j in range(n):
+            if i<j:
+            	# condition
+                result.append([y(i, j, k) for k in range(n)])
+                # substitution
+                c1, c2, c3, c4 = [], [], [], []
+                for k in range(n):
+                	c1.append([y(i,j,k), -x(k,i), x(k,j)])
+                	c2.append([y(i,j,k), x(k,i), -x(k,j)])
+                	c3.append([-y(i,j,k), x(k,i), x(k,j)])
+                	c3.append([-y(i,j,k), -x(k,i), -x(k,j)])
+                result += c1 + c2 + c3 + c4
                     
     return(result)
