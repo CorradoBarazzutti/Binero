@@ -14,6 +14,7 @@ this class models and solve the binero problem
 class Takuzu:
     input_grid = None
     solver = z3.Solver()
+    sat = False
 
     filename = None
     # abs path of project folder
@@ -34,7 +35,7 @@ class Takuzu:
         filename = self.PATH + "/dataIn/" + filename
         self.input_grid = BineroIO.read_binero(filename)
 
-    def solve(self):
+    def solve(self, cond=[0,1,2,3]):
 
         # get puzzle dimensions
         num_rows = len(self.input_grid)
@@ -78,10 +79,18 @@ class Takuzu:
                         for j in range(num_cols)
                     for i in range(num_cols) if i != j]
         # add condition to the solver
-        binero_c = row_combo + col_combo + row_par + col_par + row_eg + col_eg
-        self.solver.add(instance_c + binero_c)
+        conditions_dict = { 0: instance_c,
+                            1: row_combo + col_combo,
+                            2: row_par + col_par,
+                            3: row_eg + col_eg }
+        # select and conditions
+        binero_c = []
+        for i in cond:
+            binero_c += conditions_dict[i]
+        self.solver.add(binero_c)
         # solve
         if self.solver.check() == z3.sat:
+            sat = True
             m = self.solver.model()
             r = [[m.evaluate(X[i][j]) for j in range(num_cols)]
                  for i in range(num_rows)]

@@ -19,10 +19,11 @@ class Binero_fnc:
 
     input_grid = None
     filename = None
+    fout = None
     # abs path of project folder
     PATH = None
 
-    def __init__(self, filename):
+    def __init__(self, filename, out=""):
         #
         self.filename = filename
         # abs path of this file
@@ -36,6 +37,10 @@ class Binero_fnc:
         # dataIn file abs path
         filename = self.PATH + "/dataIn/" + filename
         self.input_grid = BineroIO.read_binero(filename)
+        if out == "":
+            self.fout = self.filename + ".dimacs"
+        else:
+            self.fout = out
 
     def boundary_conditions(self):
         result = []
@@ -49,14 +54,19 @@ class Binero_fnc:
                     result.append([-var])
         return result
 
-    def solve(self):
+    def solve(self, cond=[0,1,2,3]):
         self.boundary_conditions()
         n = len(self.input_grid)
-        conditions = self.boundary_conditions() + condition1(n) + condition2(n) + condition3(n)
-        print(conditions)
+        conditions_dict = { 0: self.boundary_conditions(),
+                            1: condition1(n),
+                            2: condition2(n),
+                            3: condition3(n)}
+        binero_c = []
+        for i in cond:
+            binero_c += conditions_dict[i]
         BineroIO.write_dimacs(
-            self.PATH + "/output/" + self.filename + ".dimacs", 
-            conditions)
+            self.PATH + "/output/" + self.fout,
+            binero_c)
 
 def condition1expensive(n):
     result = []
@@ -213,26 +223,26 @@ def condition3_naive(n):
 def condition3(n):
     result = []
     # 
-	def x(i, j):
-		return n*i + j + 1
-	# 
-	def y(i, j, k):
-		return 2 * n * n * n + (i) * n**2 + (j) * n + k + 1
+    def x(i, j):
+        return n*i + j + 1
+    # 
+    def y(i, j, k):
+        return 2 * n * n * n + (i) * n**2 + (j) * n + k + 1
 
     #pas 2 lignes pareilles 
     #i et j représentent les numéros de deux lignes
     for i in range(n):
         for j in range(n):
             if i<j:
-            	# condition
+                # condition
                 result.append([y(i, j, k) for k in range(n)])
                 # substitution
                 c1, c2, c3, c4 = [], [], [], []
                 for k in range(n):
-                	c1.append([y(i,j,k), -x(i,k), x(j,k)])
-                	c2.append([y(i,j,k), x(i,k), -x(j,k)])
-                	c3.append([-y(i,j,k), x(i,k), x(j,k)])
-                	c3.append([-y(i,j,k), -x(i,k), -x(j,k)])
+                    c1.append([y(i,j,k), -x(i,k), x(j,k)])
+                    c2.append([y(i,j,k), x(i,k), -x(j,k)])
+                    c3.append([-y(i,j,k), x(i,k), x(j,k)])
+                    c3.append([-y(i,j,k), -x(i,k), -x(j,k)])
                 result += c1 + c2 + c3 + c4
 
     #pas 2 colones pareilles 
@@ -240,15 +250,15 @@ def condition3(n):
     for i in range(n):
         for j in range(n):
             if i<j:
-            	# condition
+                # condition
                 result.append([y(i, j, k) for k in range(n)])
                 # substitution
                 c1, c2, c3, c4 = [], [], [], []
                 for k in range(n):
-                	c1.append([y(i,j,k), -x(k,i), x(k,j)])
-                	c2.append([y(i,j,k), x(k,i), -x(k,j)])
-                	c3.append([-y(i,j,k), x(k,i), x(k,j)])
-                	c3.append([-y(i,j,k), -x(k,i), -x(k,j)])
+                    c1.append([y(i,j,k), -x(k,i), x(k,j)])
+                    c2.append([y(i,j,k), x(k,i), -x(k,j)])
+                    c3.append([-y(i,j,k), x(k,i), x(k,j)])
+                    c3.append([-y(i,j,k), -x(k,i), -x(k,j)])
                 result += c1 + c2 + c3 + c4
                     
     return(result)
