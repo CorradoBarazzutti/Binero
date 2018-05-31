@@ -60,17 +60,11 @@ class Takuzu:
                      for j in range(num_rows)]
 
         # il y a le même nombre de 0 et de 1 sur chaque ligne et chaque colonne
-        combs = set(itertools.permutations(
-            [0 for _ in range(num_rows // 2)] + [1 for _ in range(num_rows // 2)],
-            r=num_rows))
-        row_par = [z3.Or([z3.And([X[i][j] if coefs[j] == 1 else z3.Not(X[i][j])
-                                  for j in range(num_cols)])
-                          for coefs in combs])
+        row_par = [z3.Sum([z3.If(X[i][j], 1, 0) for j in range(num_cols)]) == num_cols / 2
                    for i in range(num_rows)]
-        col_par = [z3.Or([z3.And([X[j][i] if coefs[j] == 1 else z3.Not(X[j][i])
-                                  for j in range(num_cols)])
-                          for coefs in combs])
+        col_par = [z3.Sum([z3.If(X[j][i], 1, 0) for j in range(num_rows)]) == num_rows / 2
                    for i in range(num_cols)]
+
         # il n’y a pas deux lignes (ou deux colonnes) remplies identiquement
         row_eg = [z3.Or([z3.Not(X[i][k] == X[j][k]) for k in range(num_cols)])
                         for j in range(num_rows)
@@ -78,11 +72,12 @@ class Takuzu:
         col_eg = [z3.Or([z3.Not(X[k][i] == X[k][j]) for k in range(num_rows)])
                         for j in range(num_cols)
                     for i in range(num_cols) if i != j]
+
         # add condition to the solver
         conditions_dict = { 0: instance_c,
-                            1: row_combo + col_combo,
-                            2: row_par + col_par,
-                            3: row_eg + col_eg }
+                            1: row_par + col_par,
+                            2: row_combo + col_combo,
+                            3: row_eg + col_eg}
         # select and conditions
         binero_c = []
         for i in cond:
@@ -90,7 +85,7 @@ class Takuzu:
         self.solver.add(binero_c)
         # solve
         if self.solver.check() == z3.sat:
-            sat = True
+            self.sat = True
             m = self.solver.model()
             r = [[m.evaluate(X[i][j]) for j in range(num_cols)]
                  for i in range(num_rows)]

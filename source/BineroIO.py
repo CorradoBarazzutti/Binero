@@ -36,8 +36,12 @@ def read_binero(filename):
 
 def write_binero(filename, grid):
     outputfile = open(filename, "w")
+    n = len(grid)
+    outputfile.writelines("binero " + str(n) + " " + str(n) + "\n")
     for row in grid:
-        outputfile.writelines(str(row) + "\n")
+        for var in row:
+            outputfile.writelines(str(var) + " ")
+        outputfile.writelines("\n")
     outputfile.close()
 
 def read_dimacs(filename):
@@ -54,7 +58,6 @@ def write_dimacs(filename, conditions):
     # clauses
     for cond in conditions:
         cond += [0]
-        print(cond)
         for var in cond:
             out.writelines(str(var) + " ")
         out.writelines("\n")
@@ -71,9 +74,9 @@ def read_minsat(filename, n):
         x = line.split()[:n*n]
         grid = []
         def sgn(number):
-            return 1 if number >= 0 else 0
+            return 1 if float(number) >= 0 else 0
         for i in range(n):
-            grid.append([sign(x[i][j]) for j in range(n)])
+            grid.append([sgn(x[n*i + j]) for j in range(n)])
     return grid
 
     # go trough all the lines in the file

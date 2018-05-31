@@ -41,19 +41,18 @@ class Client:
         output, error = process.communicate()
         print(output)
 
-        grid = io.read_minsat(self.PATH() + "/output/" + minsat) 
-        io.write_binero(self.PATH() + "/output/" + fname + "_solved",
+        grid = io.read_minsat(self.PATH + "/output/" + minsat,
+                              len(bin.input_grid))
+        io.write_binero(self.PATH + "/output/" + fname + "_solved",
                         grid)
-
-        minsat_grid = bin.grid
         return time.time() - start_time
 
     def run_z3(fname):
         tak = Takuzu.Takuzu(fname)
-        tak.solve(fname, cond=cond)
+        tak.solve(fname)
         z3_grid = tak.grid
 
-Client().run_minsat("mini")
+Client().run_minsat("petit binero")
 
 
 
